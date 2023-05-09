@@ -17,34 +17,33 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const sale_entity_1 = require("./sale.entity");
+const saleproduct_entity_1 = require("./saleproduct.entity");
 let SaleService = class SaleService {
-    constructor(saleRepository) {
+    constructor(saleRepository, saleProductRepository) {
         this.saleRepository = saleRepository;
+        this.saleProductRepository = saleProductRepository;
     }
-    async createSale(sale, products) {
-        sale.products = products;
-        sale.date = new Date();
-        return this.saleRepository.save(sale);
-    }
-    async findAll() {
-        return this.saleRepository.find({ relations: ['products'] });
-    }
-    async findById(id) {
-        return this.saleRepository.findOne({
-            where: { id },
-            relations: ['products'],
+    async createSale(sale, saleProducts) {
+        const date = new Date();
+        if (!sale.products) {
+            sale.products = [];
+        }
+        saleProducts.forEach((saleProduct) => {
+            const newSaleProduct = new saleproduct_entity_1.SaleProduct();
+            newSaleProduct.product = saleProduct.product;
+            newSaleProduct.quantity = saleProduct.quantity;
+            sale.products.push(newSaleProduct);
         });
-    }
-    async generateQRCode(saleId) {
-        const sale = await this.findById(saleId);
-        const products = sale.products.map((p) => p.name).join(',');
-        return `${sale.id}-${products}`;
+        sale.date = date;
+        return this.saleRepository.save(sale);
     }
 };
 SaleService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(sale_entity_1.Sale)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(saleproduct_entity_1.SaleProduct)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], SaleService);
 exports.SaleService = SaleService;
 //# sourceMappingURL=sale.service.js.map

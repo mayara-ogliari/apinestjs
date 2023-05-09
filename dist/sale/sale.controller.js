@@ -15,21 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SaleController = void 0;
 const common_1 = require("@nestjs/common");
 const sale_service_1 = require("./sale.service");
-const product_entity_1 = require("../product/product.entity");
-const product_service_1 = require("../product/product.service");
 const qr = require("qrcode");
 const sale_entity_1 = require("./sale.entity");
 const logging_interceptor_1 = require("../common/logging.interceptor");
 let SaleController = class SaleController {
-    constructor(saleService, productService, saleRepository) {
+    constructor(saleService, saleRepository) {
         this.saleService = saleService;
-        this.productService = productService;
         this.saleRepository = saleRepository;
     }
-    async createSale(products, res) {
-        const sale = await this.saleService.createSale(this.saleRepository, [
-            products,
-        ]);
+    async createSale(saleProductString, res) {
+        const saleProductsJson = JSON.parse(saleProductString).map(({ productId, quantity }) => ({ product: { id: productId }, quantity }));
+        const sale = await this.saleService.createSale(this.saleRepository, saleProductsJson);
         const qrCode = await qr.toBuffer(`sale/${sale.id}`, { type: 'png' });
         res.setHeader('Content-Type', 'image/png');
         res.setHeader('Content-Disposition', 'attachment; filename=qr.png');
@@ -38,18 +34,16 @@ let SaleController = class SaleController {
 };
 __decorate([
     (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Body)('saleProduct')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [product_entity_1.Product, Object]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], SaleController.prototype, "createSale", null);
 SaleController = __decorate([
     (0, common_1.Controller)('sales'),
     (0, common_1.UseInterceptors)(logging_interceptor_1.LoggingInterceptor),
-    __metadata("design:paramtypes", [sale_service_1.SaleService,
-        product_service_1.ProductService,
-        sale_entity_1.Sale])
+    __metadata("design:paramtypes", [sale_service_1.SaleService, sale_entity_1.Sale])
 ], SaleController);
 exports.SaleController = SaleController;
 //# sourceMappingURL=sale.controller.js.map

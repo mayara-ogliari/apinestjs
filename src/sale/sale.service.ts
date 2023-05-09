@@ -2,35 +2,27 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Sale } from './sale.entity';
-import { Product } from '../product/product.entity';
-
+import { SaleProduct } from './saleproduct.entity';
 @Injectable()
 export class SaleService {
   constructor(
-    @InjectRepository(Sale)
-    private saleRepository: Repository<Sale>,
+    @InjectRepository(Sale) private saleRepository: Repository<Sale>,
+    @InjectRepository(SaleProduct)
+    private saleProductRepository: Repository<SaleProduct>,
   ) {}
 
-  async createSale(sale: Sale, products: Product[]): Promise<Sale> {
-    sale.products = products;
-    sale.date = new Date();
-    return this.saleRepository.save(sale);
-  }
-
-  async findAll(): Promise<Sale[]> {
-    return this.saleRepository.find({ relations: ['products'] });
-  }
-
-  async findById(id: number): Promise<Sale> {
-    return this.saleRepository.findOne({
-      where: { id },
-      relations: ['products'],
+  async createSale(sale, saleProducts: SaleProduct[]): Promise<Sale> {
+    const date = new Date();
+    if (!sale.products) {
+      sale.products = [];
+    }
+    saleProducts.forEach((saleProduct) => {
+      const newSaleProduct = new SaleProduct();
+      newSaleProduct.product = saleProduct.product;
+      newSaleProduct.quantity = saleProduct.quantity;
+      sale.products.push(newSaleProduct);
     });
-  }
-
-  async generateQRCode(saleId: number): Promise<string> {
-    const sale = await this.findById(saleId);
-    const products = sale.products.map((p) => p.name).join(',');
-    return `${sale.id}-${products}`;
+    sale.date = date;
+    return this.saleRepository.save(sale);
   }
 }

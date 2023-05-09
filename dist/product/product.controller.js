@@ -24,12 +24,11 @@ let ProductController = class ProductController {
     async create(product) {
         return this.productService.create(product);
     }
-    async findAll() {
+    async findAll(name) {
+        if (name) {
+            return this.productService.findByName(name);
+        }
         return this.productService.findAll();
-    }
-    async findByName(name) {
-        console.log(name);
-        return this.productService.findByName(name);
     }
 };
 __decorate([
@@ -41,17 +40,11 @@ __decorate([
 ], ProductController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], ProductController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)(':name'),
-    __param(0, (0, common_1.Param)('name')),
+    __param(0, (0, common_1.Query)('name')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], ProductController.prototype, "findByName", null);
+], ProductController.prototype, "findAll", null);
 ProductController = __decorate([
     (0, common_1.Controller)('products'),
     (0, common_1.UseInterceptors)(logging_interceptor_1.LoggingInterceptor),

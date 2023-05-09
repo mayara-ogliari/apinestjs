@@ -1,11 +1,9 @@
 import { Repository } from 'typeorm';
 import { Sale } from './sale.entity';
-import { Product } from '../product/product.entity';
+import { SaleProduct } from './saleproduct.entity';
 export declare class SaleService {
     private saleRepository;
-    constructor(saleRepository: Repository<Sale>);
-    createSale(sale: Sale, products: Product[]): Promise<Sale>;
-    findAll(): Promise<Sale[]>;
-    findById(id: number): Promise<Sale>;
-    generateQRCode(saleId: number): Promise<string>;
+    private saleProductRepository;
+    constructor(saleRepository: Repository<Sale>, saleProductRepository: Repository<SaleProduct>);
+    createSale(sale: any, saleProducts: SaleProduct[]): Promise<Sale>;
 }

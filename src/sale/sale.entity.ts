@@ -8,7 +8,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Product } from '../product/product.entity';
-
 @Entity()
 export class Sale {
   @PrimaryGeneratedColumn()

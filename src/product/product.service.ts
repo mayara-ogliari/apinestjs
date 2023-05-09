@@ -18,6 +18,15 @@ export class ProductService {
     return this.productRepository.find();
   }
 
+  async findById(id: number): Promise<Product> {
+    return this.productRepository.findOne({ where: { id: id } });
+  }
+
+  async updateQuantity(product: Product, quantity: number): Promise<Product> {
+    product.quantity += quantity;
+    return this.productRepository.save(product);
+  }
+
   async findByName(name: string): Promise<Product> {
     return this.productRepository.findOne({
       where: {

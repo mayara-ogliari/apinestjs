@@ -1,7 +1,7 @@
 import {
   Controller,
   Get,
-  Param,
+  Query,
   Post,
   Body,
   UseInterceptors,
@@ -21,13 +21,10 @@ export class ProductController {
   }
 
   @Get()
-  async findAll() {
+  async findAll(@Query('name') name?: string) {
+    if (name) {
+      return this.productService.findByName(name);
+    }
     return this.productService.findAll();
-  }
-
-  @Get(':name')
-  async findByName(@Param('name') name: string) {
-    console.log(name);
-    return this.productService.findByName(name);
   }
 }

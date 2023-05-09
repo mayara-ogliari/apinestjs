@@ -27,6 +27,13 @@ let ProductService = class ProductService {
     async findAll() {
         return this.productRepository.find();
     }
+    async findById(id) {
+        return this.productRepository.findOne({ where: { id: id } });
+    }
+    async updateQuantity(product, quantity) {
+        product.quantity += quantity;
+        return this.productRepository.save(product);
+    }
     async findByName(name) {
         return this.productRepository.findOne({
             where: {
